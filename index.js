@@ -43,7 +43,7 @@ function skorArtirici() {
    return skor++;
   }
 }
-
+/* 2 Global bir variable kullaniyor, birincisi ise fonksiyonun icerisinde tanimlamis, sahsen birinciyi kullanmayi tercih ederim */
 const skor1 = skorArtirici();
 
 // skor2 kodları
@@ -64,10 +64,9 @@ Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
 Not: Bu fonskiyon, aşağıdaki diğer görevler için de bir callback fonksiyonu olarak da kullanılacak
 */
 
-function takimSkoru(/*Kodunuzu buraya yazınız*/){
-    /*Kodunuzu buraya yazınız*/
+function takimSkoru() {
+  return Math.floor(Math.random() * 16) + 10 ; // Generates a random score between 10 and 25 
 }
-
 
 
 
@@ -86,11 +85,22 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
 }
 */ 
 
-function macSonucu(/*Kodunuzu buraya yazınız*/){
-  /*Kodunuzu buraya yazınız*/
+function macSonucu(takimSkoruCallback, quarterCount) {
+  let evSahibiSkor = 0 
+  let konukTakimSkor = 0
+
+  for (let i = 1; i <= quarterCount; i++) {
+
+    const evSahibiSkorPerQuarter = takimSkoruCallback();
+
+    const konukTakimSkorPerQuarter = takimSkoruCallback();
+
+    evSahibiSkor += evSahibiSkorPerQuarter;
+
+    konukTakimSkor += konukTakimSkorPerQuarter;
+  }
+  return { "EvSahibi": evSahibiSkor, "KonukTakim": konukTakimSkor };
 }
-
-
 
 
 
@@ -108,12 +118,12 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
 }
   */
 
-
-function periyotSkoru(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
-
+function periyotSkoru(takimSkoruCallback) {
+  return {
+    "EvSahibi": takimSkoruCallback(),
+    "KonukTakim": takimSkoruCallback()
+  };
 }
-
 
 /* Zorlayıcı Görev 5: skorTabelasi() 
 Aşağıdaki skorTabelasi() fonksiyonunu kullanarak aşağıdakileri yapınız:
@@ -146,11 +156,36 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 ] */
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
-function skorTabelasi(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function skorTabelasi(periyotSkoruCallback, takimSkoruCallback, quarterCount) {
+  const scores = [];
+
+  let evSahibiSkor = 0
+
+   konukTakimSkor = 0
+
+  for (let i = 1; i <= quarterCount; i++) {
+
+    const quarterScores = periyotSkoruCallback(takimSkoruCallback);
+    evSahibiSkor += quarterScores.EvSahibi;
+    konukTakimSkor += quarterScores.KonukTakim;
+    scores.push(`${i}. Periyot: Ev Sahibi ${quarterScores.EvSahibi} - Konuk Takım ${quarterScores.KonukTakim}`);
+  }
+
+  if (evSahibiSkor === konukTakimSkor) {
+    let uzatma = 1;
+    while (true) {
+      const uzatmaScores = periyotSkoruCallback(takimSkoruCallback);
+      evSahibiSkor += uzatmaScores.EvSahibi;
+      konukTakimSkor += uzatmaScores.KonukTakim;
+      scores.push(`Uzatma ${uzatma}: Ev Sahibi ${uzatmaScores.EvSahibi} - Konuk Takım ${uzatmaScores.KonukTakim}`);
+      if (evSahibiSkor !== konukTakimSkor || uzatma > 3) break;
+      uzatma++;
+    }
+  }
+  
+  scores.push(`Maç Sonucu: Ev Sahibi ${evSahibiSkor} - Konuk Takım ${konukTakimSkor}`);
+  return scores;
 }
-
-
 
 
 /* Aşağıdaki satırları lütfen değiştirmeyiniz*/
